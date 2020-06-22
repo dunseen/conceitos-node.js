@@ -12,8 +12,23 @@ app.use(cors());
 
 const repositories = [];
 
+function logRequests(request, response,next){
+  const { method, url }= request;
+
+  const logLabel = `[${method.toUpperCase()}] ${url}`;
+
+  console.time(logLabel);
+
+  next();
+  
+  console.timeEnd(logLabel);
+}
+
+app.use(logRequests);
+
 app.get("/repositories", (request, response) => {
   return response.json(repositories);
+  console.log('LISTANDO REPOSITORIO');
   
 });
 
@@ -81,11 +96,10 @@ app.post("/repositories/:id/like", (request, response) => {
   if (projectIndex < 0){
     return response.status(400).json({error: "Project not found"});
   }
-  const likes = repositories[projectIndex].likes;
 
-  const likesIncrement = repositories[projectIndex].likes = likes + 1;
-
-  return response.json({ likes: likesIncrement});
+  const likes = repositories[projectIndex].likes +=1;
+  
+  return response.json({ likes: likes});
 
 });
 
